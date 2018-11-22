@@ -25,7 +25,7 @@ class Player extends EventEmitter {
     this._path = path;
     this._options = options;
 
-    this._playerId = playerId++;
+    this._playerId = options.id ? options.id : playerId++;
     this._reset();
 
     const appEventEmitter = Platform.OS === 'ios' ? NativeAppEventEmitter : DeviceEventEmitter;
@@ -183,6 +183,17 @@ class Player extends EventEmitter {
   }
 
   stop(callback = _.noop) {
+    RCTAudioPlayer.stop(this._playerId, (err, results) => {
+      this._updateState(err, MediaStates.PREPARED);
+      this._position = -1;
+      callback(err);
+    });
+
+    return this;
+  }
+
+  stopAll(callback = _.noop) {
+    console.log('this audio-toolkit', this)
     RCTAudioPlayer.stop(this._playerId, (err, results) => {
       this._updateState(err, MediaStates.PREPARED);
       this._position = -1;
